@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Image Steganography{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-image"></i> Image Steganography</h1>
+    <p>Hide secret messages in images using LSB encoding</p>
+</div>
+
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tab-btn {% if not active_tab or active_tab == 'encode' %}active{% endif %}" onclick="switchTab('encode')">
+            <i class="fas fa-lock"></i> Encode
+        </button>
+        <button class="tab-btn {% if active_tab == 'decode' %}active{% endif %}" onclick="switchTab('decode')">
+            <i class="fas fa-unlock"></i> Decode
+        </button>
+    </div>
+
+    <!-- Encode Tab -->
+    <div id="encode-tab" class="tab-content {% if not active_tab or active_tab == 'encode' %}active{% endif %}">
+        <form action="{{ url_for('image_encode') }}" method="POST" enctype="multipart/form-data" class="stego-form">
+            <div class="form-grid">
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-image"></i> Upload Image
+                    </label>
+                    <div class="drop-zone" id="image-drop-zone">
+                        <input type="file" name="image" id="image-input" accept=".png,.bmp,.jpg,.jpeg,.webp" required>
+                        <div class="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop an image here</p>
+                            <span>or click to browse (PNG, JPG, WebP, BMP)</span>
+                        </div>
+                        <div class="drop-zone-preview" id="image-preview"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-comment"></i> Secret Message
+                    </label>
+                    <textarea name="message" class="form-textarea" placeholder="Enter your secret message here..." required></textarea>
+                    
+                    <label class="form-label mt-4">
+                        <i class="fas fa-key"></i> Password (Optional)
+                    </label>
+                    <input type="password" name="password" class="form-input" placeholder="Encrypt with AES-256">
+                    <small class="form-hint">Leave blank for no encryption</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-lock"></i> Encode Message
+            </button>
+        </form>
+
+        {% if download_file %}
+        <div class="result-section">
+            <h3><i class="fas fa-check-circle"></i> Success!</h3>
+            <p>Your message has been hidden in the image.</p>
+            
+            {% if metadata %}
+            <div class="metadata-box">
+                <p><strong>Capacity Used:</strong> {{ metadata.capacity_used }}</p>
+                <p><strong>Encrypted:</strong> {{ 'Yes' if metadata.encrypted else 'No' }}</p>
+            </div>
+            {% endif %}
+            
+            {% if preview_image %}
+            <div class="preview-box">
+                <h4>Result Preview:</h4>
+                <img src="data:image/png;base64,{{ preview_image }}" alt="Encoded image">
+            </div>
+            {% endif %}
+            
+            <a href="{{ url_for('download', filename=download_file) }}" class="btn btn-success">
+                <i class="fas fa-download"></i> Download Stego Image
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Decode Tab -->
+    <div id="decode-tab" class="tab-content {% if active_tab == 'decode' %}active{% endif %}">
+        <form action="{{ url_for('image_decode') }}" method="POST" enctype="multipart/form-data" class="stego-form">
+            <div class="form-grid">
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-image"></i> Upload Stego Image
+                    </label>
+                    <div class="drop-zone" id="decode-drop-zone">
+                        <input type="file" name="image" id="decode-image-input" accept=".png,.bmp,.jpg,.jpeg,.webp" required>
+                        <div class="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop a stego image here</p>
+                            <span>or click to browse (PNG, JPG, WebP, BMP)</span>
+                        </div>
+                        <div class="drop-zone-preview" id="decode-preview"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-key"></i> Password
+                    </label>
+                    <input type="password" name="password" class="form-input" placeholder="Enter password if encrypted">
+                    <small class="form-hint">Required if the message was encrypted</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-unlock"></i> Decode Message
+            </button>
+        </form>
+
+        {% if decoded_message %}
+        <div class="result-section">
+            <h3><i class="fas fa-check-circle"></i> Message Decoded!</h3>
+            
+            {% if decode_metadata %}
+            <div class="metadata-box">
+                <p><strong>Message Length:</strong> {{ decode_metadata.message_length }} bytes</p>
+                <p><strong>Was Encrypted:</strong> {{ 'Yes' if decode_metadata.encrypted else 'No' }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="message-box">
+                <label>Decoded Message:</label>
+                <textarea class="form-textarea" readonly>{{ decoded_message }}</textarea>
+                <button type="button" class="btn btn-secondary" onclick="copyToClipboard(this.previousElementSibling)">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

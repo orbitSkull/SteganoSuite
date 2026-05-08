@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Steganalysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-search"></i> Steganalysis</h1>
+    <p>Detect hidden messages in images using statistical analysis</p>
+</div>
+
+<div class="analyze-container">
+    <form action="{{ url_for('analyze_run') }}" method="POST" enctype="multipart/form-data" class="stego-form">
+        <div class="form-section">
+            <label class="form-label">
+                <i class="fas fa-image"></i> Upload Image for Analysis
+            </label>
+            <div class="drop-zone" id="analyze-drop-zone">
+                <input type="file" name="image" id="analyze-image-input" accept=".png,.bmp,.jpg,.jpeg,.webp" required>
+                <div class="drop-zone-content">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop an image to analyze</p>
+                    <span>or click to browse (PNG, JPG, WebP, BMP)</span>
+                </div>
+                <div class="drop-zone-preview" id="analyze-preview"></div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-large">
+            <i class="fas fa-search"></i> Run Analysis
+        </button>
+    </form>
+
+    {% if results %}
+    <div class="analysis-results">
+        <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
+        
+        <!-- Verdict Section -->
+        <div class="verdict-box verdict-{{ results.verdict_class }}">
+            <div class="verdict-icon">
+                {% if results.verdict_class == 'danger' %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                {% elif results.verdict_class == 'warning' %}
+                    <i class="fas fa-question-circle"></i>
+                {% else %}
+                    <i class="fas fa-check-circle"></i>
+                {% endif %}
+            </div>
+            <div class="verdict-content">
+                <h3>{{ results.verdict }}</h3>
+                <p>Confidence: {{ results.confidence }}%</p>
+            </div>
+        </div>
+
+        <!-- Chi-Square Score -->
+        <div class="score-section">
+            <h4><i class="fas fa-calculator"></i> Chi-Square Score</h4>
+            <div class="score-bar-container">
+                <div class="score-bar" style="width: {{ results.confidence }}%"></div>
+            </div>
+            <p class="score-value">Score: {{ results.chi_square_score }} (higher values suggest normal image)</p>
+        </div>
+
+        <!-- Histogram Visualization -->
+        {% if results.histogram_image %}
+        <div class="visualization-section">
+            <h4><i class="fas fa-chart-area"></i> Histogram Comparison</h4>
+            <p class="section-description">Distribution of pixel values across RGB channels. Stego images may show subtle flattening.</p>
+            <div class="chart-container">
+                <img src="data:image/png;base64,{{ results.histogram_image }}" alt="Histogram comparison">
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Bit-Plane Visualization -->
+        {% if results.bit_planes_image %}
+        <div class="visualization-section">
+            <h4><i class="fas fa-layer-group"></i> Bit-Plane Visualization</h4>
+            <p class="section-description">Each bit plane of the image. The LSB plane (bit 0) often reveals hidden data patterns.</p>
+            <div class="chart-container">
+                <img src="data:image/png;base64,{{ results.bit_planes_image }}" alt="Bit-plane visualization">
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Interpretation -->
+        <div class="interpretation-box">
+            <h4><i class="fas fa-info-circle"></i> Interpretation Guide</h4>
+            <ul>
+                <li><strong>High Confidence (>70%):</strong> Strong statistical indicators of hidden data</li>
+                <li><strong>Medium Confidence (40-70%):</strong> Some anomalies detected, may or may not contain data</li>
+                <li><strong>Low Confidence (<40%):</strong> Image appears clean, no strong indicators of steganography</li>
+            </ul>
+            <p class="note"><i class="fas fa-exclamation-circle"></i> Note: These are statistical indicators and not definitive proof. Advanced steganography may evade detection.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

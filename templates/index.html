@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="gradient-text">SteganoSuite</h1>
+        <p class="hero-subtitle">Professional-grade steganography platform for hiding secret data in images, audio, and text with military-grade AES-256 encryption.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('image') }}" class="btn btn-primary">
+                <i class="fas fa-image"></i> Hide in Image
+            </a>
+            <a href="{{ url_for('audio') }}" class="btn btn-secondary">
+                <i class="fas fa-music"></i> Hide in Audio
+            </a>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="floating-card">
+            <i class="fas fa-lock"></i>
+            <span>AES-256 Encryption</span>
+        </div>
+        <div class="floating-card delay-1">
+            <i class="fas fa-eye-slash"></i>
+            <span>Invisible Data</span>
+        </div>
+        <div class="floating-card delay-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure Transfer</span>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-title">Choose Your Method</h2>
+    <div class="features-grid">
+        <a href="{{ url_for('image') }}" class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-image"></i>
+            </div>
+            <h3>Image Steganography</h3>
+            <p>Hide secret messages in images (PNG, JPG, WebP, BMP). Auto-converts to PNG for lossless steganography. Supports optional AES-256 encryption.</p>
+            <span class="feature-link">Get Started <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+        <a href="{{ url_for('audio') }}" class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-music"></i>
+            </div>
+            <h3>Audio Steganography</h3>
+            <p>Embed hidden data in audio files (WAV, MP3, FLAC, AAC, OGG, M4A). Auto-converts to 16-bit PCM WAV for optimal encoding.</p>
+            <span class="feature-link">Get Started <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+        <a href="{{ url_for('text') }}" class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-font"></i>
+            </div>
+            <h3>Text Steganography</h3>
+            <p>Conceal messages in plain text using invisible zero-width Unicode characters. Completely undetectable to the human eye.</p>
+            <span class="feature-link">Get Started <i class="fas fa-arrow-right"></i></span>
+        </a>
+
+        <a href="{{ url_for('analyze') }}" class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Steganalysis</h3>
+            <p>Detect hidden messages in images using chi-square analysis, histogram comparison, and bit-plane visualization.</p>
+            <span class="feature-link">Analyze Now <i class="fas fa-arrow-right"></i></span>
+        </a>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Data Types</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">256-bit</div>
+        <div class="stat-label">AES Encryption</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Invisible</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-number">Free</div>
+        <div class="stat-label">Open Source</div>
+    </div>
+</section>
+{% endblock %}

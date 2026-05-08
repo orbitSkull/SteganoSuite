@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Text Steganography{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-font"></i> Text Steganography</h1>
+    <p>Hide secret messages using invisible zero-width characters</p>
+</div>
+
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tab-btn {% if not active_tab or active_tab == 'encode' %}active{% endif %}" onclick="switchTab('encode')">
+            <i class="fas fa-lock"></i> Encode
+        </button>
+        <button class="tab-btn {% if active_tab == 'decode' %}active{% endif %}" onclick="switchTab('decode')">
+            <i class="fas fa-unlock"></i> Decode
+        </button>
+    </div>
+
+    <!-- Encode Tab -->
+    <div id="encode-tab" class="tab-content {% if not active_tab or active_tab == 'encode' %}active{% endif %}">
+        <form action="{{ url_for('text_encode') }}" method="POST" class="stego-form">
+            <div class="form-section">
+                <label class="form-label">
+                    <i class="fas fa-file-alt"></i> Cover Text
+                </label>
+                <textarea name="cover_text" class="form-textarea large" placeholder="Enter the visible text here. The secret message will be hidden within this text using invisible characters..." required></textarea>
+                <small class="form-hint">This is the text that will be visible to everyone</small>
+            </div>
+
+            <div class="form-section mt-4">
+                <label class="form-label">
+                    <i class="fas fa-comment-dots"></i> Secret Message
+                </label>
+                <textarea name="secret_message" class="form-textarea" placeholder="Enter the secret message you want to hide..." required></textarea>
+                <small class="form-hint">This message will be invisible to the human eye</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-lock"></i> Hide Message
+            </button>
+        </form>
+
+        {% if stego_text %}
+        <div class="result-section">
+            <h3><i class="fas fa-check-circle"></i> Success!</h3>
+            <p>Your secret message has been hidden in the text.</p>
+            
+            <div class="message-box">
+                <label>Stego Text (Copy this):</label>
+                <textarea id="stego-text" class="form-textarea" readonly>{{ stego_text }}</textarea>
+                <button type="button" class="btn btn-secondary" onclick="copyToClipboard(document.getElementById('stego-text'))">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+            </div>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <p>The text above contains your hidden message but looks identical to the original. You can copy and paste it anywhere!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Decode Tab -->
+    <div id="decode-tab" class="tab-content {% if active_tab == 'decode' %}active{% endif %}">
+        <form action="{{ url_for('text_decode') }}" method="POST" class="stego-form">
+            <div class="form-section">
+                <label class="form-label">
+                    <i class="fas fa-file-alt"></i> Stego Text
+                </label>
+                <textarea name="stego_text" class="form-textarea large" placeholder="Paste the text containing the hidden message here..." required></textarea>
+                <small class="form-hint">Paste the text that contains invisible zero-width characters</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-unlock"></i> Reveal Message
+            </button>
+        </form>
+
+        {% if decoded_message %}
+        <div class="result-section">
+            <h3><i class="fas fa-check-circle"></i> Message Revealed!</h3>
+            
+            <div class="message-box">
+                <label>Hidden Message:</label>
+                <textarea class="form-textarea" readonly>{{ decoded_message }}</textarea>
+                <button type="button" class="btn btn-secondary" onclick="copyToClipboard(this.previousElementSibling)">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="info-section">
+    <h3><i class="fas fa-lightbulb"></i> How It Works</h3>
+    <div class="info-grid">
+        <div class="info-card">
+            <i class="fas fa-eye-slash"></i>
+            <h4>Invisible Characters</h4>
+            <p>Uses zero-width space (U+200B) and zero-width non-joiner (U+200C) Unicode characters that are completely invisible.</p>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-shield-alt"></i>
+            <h4>Undetectable</h4>
+            <p>The stego text looks identical to normal text. Only specialized tools can detect the hidden data.</p>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-copy"></i>
+            <h4>Copy-Paste Safe</h4>
+            <p>Hidden characters are preserved when copying and pasting across most applications and platforms.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
