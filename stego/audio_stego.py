@@ -55,13 +55,12 @@ def encode_audio(audio_bytes, message, password=None):
     length = len(message_bytes)
     binary_data = format(length, '032b') + ''.join(format(byte, '08b') for byte in message_bytes)
     
-    # Make a copy of the array for modification
-    encoded_array = audio_array.copy()
+    encoded_array = audio_array.copy().astype(np.uint16)
     
-    # Encode bits into LSB of samples
     for i, bit in enumerate(binary_data):
-        # Clear LSB and set to our bit
         encoded_array[i] = (encoded_array[i] & 0xFFFE) | int(bit)
+    
+    encoded_array = encoded_array.astype(np.int16)
     
     # Create output WAV file
     output = io.BytesIO()
